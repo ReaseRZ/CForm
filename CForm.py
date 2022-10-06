@@ -48,6 +48,15 @@ def add_question():
     dpg.add_text(question,parent="list",tag="quest")
     dpg.configure_item("text",default_value="")
 
+def open_user_panel():
+    dpg.configure_item("main_menu",show=False)
+    dpg.configure_item("user_panel_window",show=True)
+    dpg.set_primary_window(item=user_panel)
+
+def return_to_main_menu_from_user():
+    dpg.configure_item("user_panel_window",show=False)
+    dpg.configure_item("main_menu",show=True)
+
 with dpg.font_registry():
     font_sklscr = dpg.add_font(file="Font/slkscr.ttf",size=50)
 
@@ -67,8 +76,11 @@ with dpg.window(label="admin_panel",no_title_bar=True,no_close=True,show=False,t
         back_btn = dpg.add_button(label="BACK",callback=return_to_main_menu)
         export_btn = dpg.add_button(label="EXPORT")
 
-with dpg.windww(label="user_panel",no_title_bar=True,no_close=True,show=False,tag="user_panel_window",no_resize=True) as user_panel:
-    
+with dpg.window(label="user_panel",no_title_bar=True,no_close=True,show=False,tag="user_panel_window",no_resize=True) as user_panel:
+    child = dpg.add_child_window(width=900,height=350,show=True,tag="user_child")
+    dpg.add_spacer(width=300)
+    submit_btn = dpg.add_button(label="SUBMIT")
+    back = dpg.add_button(label="BACK",callback=return_to_main_menu_from_user)
 
 
 with dpg.window(label="Admin Login Panel",no_title_bar=True,no_close=True,modal=True,show=False,no_resize=True,tag="login_admin",width=300,height=150):
@@ -88,7 +100,7 @@ with dpg.window(autosize=False, no_collapse=True, no_resize=True, no_close=True,
 
     dpg.add_spacer(height=350)
     admin = dpg.add_button(label="ADMIN",pos=[10,window_height-50],callback=lambda: dpg.configure_item("login_admin",show=True))
-    user = dpg.add_button(label='USER',pos=[10,window_height-25])
+    user = dpg.add_button(label='USER',pos=[10,window_height-25],callback=open_user_panel)
 
     with dpg.group(horizontal=True):
         main_title = dpg.add_text(default_value="CFROM",pos=[window_width/2-100,window_height/2-50])
