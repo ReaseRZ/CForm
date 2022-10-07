@@ -17,13 +17,17 @@ Minimalist based windows application form to help with make offline form with in
 ![image](https://user-images.githubusercontent.com/88366703/194494279-8e46d72f-27ac-43bb-952b-0a32ecfcea2b.png)
 ### Confirm Pop Up to export current data to excel
 ![image](https://user-images.githubusercontent.com/88366703/194494546-b7a7b667-33f4-46a3-89c2-8a0949d7a00e.png)
+### Result
+It will be file data.xlsx included data from the form
+![image](https://user-images.githubusercontent.com/88366703/194501064-c9b2b85c-79af-4d4c-a807-9b35511c978e.png)
+
 
 # How To Run
 If you don't install dearpygui yet. You can enter this command in your terminal
-'pip install dearpygui'
+`pip install dearpygui`
 If you don't install openpyxl yet. You can enter this command in your terminal
-'pip install openpyxl'
+`pip install openpyxl`
 
 then run it with
-'py CForm.py'
+`py CForm.py`
 
