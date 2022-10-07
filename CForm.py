@@ -12,7 +12,7 @@ question_list = []
 
 question = ""
 dpg.create_viewport(title="CForm",decorated=False)
-dpg.configure_viewport(0, x_pos=0, y_pos=0, width=window_width, height=window_height)
+dpg.configure_viewport(0, x_pos=100, y_pos=100, width=window_width, height=window_height)
 dpg.set_viewport_max_height(window_height)
 dpg.set_viewport_max_width(window_width)
 
@@ -48,6 +48,7 @@ def submit_answer():
     container=[]
     for string in question_list:
         container.append(dpg.get_value(string))
+        dpg.configure_item(string,default_value="")
     worksheet.append(container)
 
 def open_user_panel():
@@ -60,6 +61,7 @@ def return_to_main_menu_from_user():
     dpg.configure_item("main_menu",show=True)
 
 def export_data():
+    dpg.configure_item("export_confirm",show=False)
     workbook.save("data.xlsx")
 
 with dpg.font_registry():
@@ -73,18 +75,26 @@ with dpg.window(label="add_question",no_title_bar=True,no_close=True,show=False,
         dpg.add_button(label="BACK",callback=lambda:dpg.configure_item("question",show=False))
 
 with dpg.window(label="admin_panel",no_title_bar=True,no_close=True,show=False,tag="panel_admin",no_resize=True) as panel_admin:
-    child_window = dpg.add_child_window(width=880,height=330,show=True,tag='list')
+    child_window = dpg.add_child_window(width=880,height=400,show=True,tag='list')
     with dpg.group(horizontal=True):
         add_btn = dpg.add_button(label="ADD",callback=lambda:dpg.configure_item("question",show=True))
-        delete_btn = dpg.add_button(label="DELETE")
+        #delete_btn = dpg.add_button(label="DELETE")
         back_btn = dpg.add_button(label="BACK",callback=return_to_main_menu)
-        export_btn = dpg.add_button(label="EXPORT",callback=export_data)
+        export_btn = dpg.add_button(label="EXPORT",callback=lambda:dpg.configure_item("export_confirm",show=True))
 
 with dpg.window(label="user_panel",no_title_bar=True,no_close=True,show=False,tag="user_panel_window",no_resize=True) as user_panel:
-    child = dpg.add_child_window(width=900,height=350,show=True,tag="user_child")
+    child = dpg.add_child_window(width=900,height=400,show=True,tag="user_child")
     dpg.add_spacer(width=300)
     submit_btn = dpg.add_button(label="SUBMIT",callback=submit_answer)
     back = dpg.add_button(label="BACK",callback=return_to_main_menu_from_user)
+
+with dpg.window(label="export_confirmation",no_title_bar=True,no_close=True,modal=True,show=False,no_resize=True,tag="export_confirm",width=500,height=40):
+    dpg.add_text("Are you sure want to export current data to excel ?")
+    dpg.add_separator()
+    with dpg.group(horizontal=True):
+        dpg.add_spacer(width=190)
+        dpg.add_button(label="YES",callback=export_data)
+        dpg.add_button(label="NO",callback=lambda:dpg.configure_item("export_confirm",show=False))
 
 with dpg.window(label="Admin Login Panel",no_title_bar=True,no_close=True,modal=True,show=False,no_resize=True,tag="login_admin",width=300,height=150):
     username_label = dpg.add_text("USERNAME")
@@ -92,13 +102,12 @@ with dpg.window(label="Admin Login Panel",no_title_bar=True,no_close=True,modal=
     password_label = dpg.add_text("PASSWORD")
     password_text = dpg.add_input_text(password=True,tag="password",default_value="")
     dpg.add_separator()
-
     with dpg.group(horizontal=True):
         dpg.add_spacer(width=50,height=15)
         dpg.add_button(label="LOGIN",callback=check_validation)
         dpg.add_button(label="BACK",callback=lambda:dpg.configure_item("login_admin",show=False))
 
-with dpg.window(autosize=False, no_collapse=True, no_resize=True, no_close=True,
+with dpg.window(no_collapse=True, no_resize=True, no_close=True,
                 no_title_bar=True,tag="main_menu") as main_menu_screen:
 
 
@@ -107,7 +116,7 @@ with dpg.window(autosize=False, no_collapse=True, no_resize=True, no_close=True,
     user = dpg.add_button(label='USER',pos=[10,window_height-25],callback=open_user_panel)
 
     with dpg.group(horizontal=True):
-        main_title = dpg.add_text(default_value="CFROM",pos=[window_width/2-100,window_height/2-50])
+        main_title = dpg.add_text(default_value="CFORM",pos=[window_width/2-100,window_height/2-50])
         dpg.bind_item_font(main_title,font_sklscr)
 
 
