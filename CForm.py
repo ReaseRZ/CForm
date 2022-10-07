@@ -1,18 +1,14 @@
 import dearpygui.dearpygui as dpg
+from openpyxl import Workbook
 
 dpg.create_context()
 
 username = "admin"
 password = "12345"
 
-local_username = ""
-local_password = ""
-
 window_width = 960
 window_height = 560
-
-list_jawaban=[]
-list_soal=[]
+question_list = []
 
 question = ""
 dpg.create_viewport(title="CForm",decorated=False)
@@ -20,19 +16,16 @@ dpg.configure_viewport(0, x_pos=0, y_pos=0, width=window_width, height=window_he
 dpg.set_viewport_max_height(window_height)
 dpg.set_viewport_max_width(window_width)
 
-def submit_username(sender):
-    global local_username
-    local_username = dpg.get_value(sender)
-
-def submit_password(sender):
-    global local_password
-    local_password = dpg.get_value(sender)
+workbook = Workbook()
+worksheet = workbook.active
 
 def get_question(sender):
     global question
     question = dpg.get_value(sender)
 
 def check_validation():
+    local_username = dpg.get_value("username")
+    local_password = dpg.get_value("password")
     if username == local_username and password == local_password:
         dpg.configure_item("main_menu",show=False)
         dpg.configure_item("panel_admin",show=True)
@@ -44,50 +37,60 @@ def return_to_main_menu():
     dpg.set_primary_window(main_menu_screen,value=True)
 
 def add_question():
-    print(question)
-    dpg.add_text(question,parent="list",tag="quest")
+    dpg.add_text(question,parent="user_child")
+    ttl = dpg.add_input_text(parent="user_child",tag=f"user{len(question_list)}")
+    dpg.add_separator(parent="user_child")
+    quest_btn = dpg.add_text(question,parent="list",tag=f"quest{dpg.generate_uuid()}")
     dpg.configure_item("text",default_value="")
+    question_list.append(f"user{len(question_list)}")
+
+def submit_answer():
+    container=[]
+    for string in question_list:
+        container.append(dpg.get_value(string))
+    worksheet.append(container)
 
 def open_user_panel():
     dpg.configure_item("main_menu",show=False)
     dpg.configure_item("user_panel_window",show=True)
-    dpg.set_primary_window(item=user_panel)
+    dpg.set_primary_window(user_panel,value=True)
 
 def return_to_main_menu_from_user():
     dpg.configure_item("user_panel_window",show=False)
     dpg.configure_item("main_menu",show=True)
+
+def export_data():
+    workbook.save("data.xlsx")
 
 with dpg.font_registry():
     font_sklscr = dpg.add_font(file="Font/slkscr.ttf",size=50)
 
 with dpg.window(label="add_question",no_title_bar=True,no_close=True,show=False,modal=True,no_resize=True,tag='question',width=300,height=100):
     label = dpg.add_text("QUESTION")
-    text_quest = dpg.add_input_text(callback=get_question)
+    text_quest = dpg.add_input_text(callback=get_question,tag="text")
     with dpg.group(horizontal=True):
         dpg.add_button(label="ADD",callback=add_question)
         dpg.add_button(label="BACK",callback=lambda:dpg.configure_item("question",show=False))
 
 with dpg.window(label="admin_panel",no_title_bar=True,no_close=True,show=False,tag="panel_admin",no_resize=True) as panel_admin:
     child_window = dpg.add_child_window(width=880,height=330,show=True,tag='list')
-    dpg.add_text("Hello",parent="list")
     with dpg.group(horizontal=True):
         add_btn = dpg.add_button(label="ADD",callback=lambda:dpg.configure_item("question",show=True))
         delete_btn = dpg.add_button(label="DELETE")
         back_btn = dpg.add_button(label="BACK",callback=return_to_main_menu)
-        export_btn = dpg.add_button(label="EXPORT")
+        export_btn = dpg.add_button(label="EXPORT",callback=export_data)
 
 with dpg.window(label="user_panel",no_title_bar=True,no_close=True,show=False,tag="user_panel_window",no_resize=True) as user_panel:
     child = dpg.add_child_window(width=900,height=350,show=True,tag="user_child")
     dpg.add_spacer(width=300)
-    submit_btn = dpg.add_button(label="SUBMIT")
+    submit_btn = dpg.add_button(label="SUBMIT",callback=submit_answer)
     back = dpg.add_button(label="BACK",callback=return_to_main_menu_from_user)
-
 
 with dpg.window(label="Admin Login Panel",no_title_bar=True,no_close=True,modal=True,show=False,no_resize=True,tag="login_admin",width=300,height=150):
     username_label = dpg.add_text("USERNAME")
-    username_input = dpg.add_input_text(tag="username",default_value="",callback=submit_username)
+    username_input = dpg.add_input_text(tag="username",default_value="")
     password_label = dpg.add_text("PASSWORD")
-    password_text = dpg.add_input_text(password=True,tag="password",default_value="",callback=submit_password)
+    password_text = dpg.add_input_text(password=True,tag="password",default_value="")
     dpg.add_separator()
 
     with dpg.group(horizontal=True):
@@ -97,6 +100,7 @@ with dpg.window(label="Admin Login Panel",no_title_bar=True,no_close=True,modal=
 
 with dpg.window(autosize=False, no_collapse=True, no_resize=True, no_close=True,
                 no_title_bar=True,tag="main_menu") as main_menu_screen:
+
 
     dpg.add_spacer(height=350)
     admin = dpg.add_button(label="ADMIN",pos=[10,window_height-50],callback=lambda: dpg.configure_item("login_admin",show=True))
